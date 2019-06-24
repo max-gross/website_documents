@@ -1,6 +1,6 @@
 clear
 set more off
-graph set window fontface "Serif"
+graph set window fontface "Times New Roman"
 
 set obs 4
 gen group=1 if _n<=2
