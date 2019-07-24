@@ -1,45 +1,76 @@
-set more off 
 clear
-cd "C:\Users\maxgross\Downloads\"
-graph set window fontface "Times New Roman"
+set more off
+macro drop all
+capture log close
+graph set window fontface "Times"
 
-import excel "main_figures.xlsx", sheet("Deanza") firstrow clear
+/********************************************************************************
+Course Shutouts
+Complier Densities 
 
-# delimit ;
-twoway  (line transfer2 year if group=="asian", lcolor(gs13) lpattern(solid)) 
-		(line transfer2 year if group=="white", lcolor(gs13) lpattern(solid))
-		(line transfer2 year if group=="urm", lcolor(sea) lpattern(solid) lwidth(medthick)),
-		text(0.06 4 "Underrep Minority", size(large))
-		text(0.018 4 "Asian", size(large))
-		text(-0.011 4 "White", size(large))
-		legend(off) scheme(plotplain) 
-		yscale(range(-0.1 0.1))
-		ylabel(-0.1 0 0.1,labsize(large) ) xlabel(,labsize(large))
-		ytitle("") xtitle("")
-		title("")
-		subtitle("Shutouts Cause Some to" 
-		"Transfer to Another Two Year"  "College...", justification(left)
-		bexpand size(huge)) saving(t2, replace);
-# delimit cr
+Created on: 4/6/17
+
+Last Modified on: 6/20/19
+
+Description: This file creates figures showing the density of complier outcomes.
+
+********************************************************************************/
+
+** Setting the Directory 
+global output "/afs/umich.edu/user/s/r/srobles/DeAnza/Do Files/primary2014/Output Data/"
+global graph "/afs/umich.edu/user/s/r/srobles/DeAnza/Do Files/primary2014/Graphs/working/"
+
+********************************************************************************
+
+**********************************
+**(1) ESTIMATE COMPLIER DENSITY
+**********************************
+
+use "$output/deanza_master_analysis.dta", clear
+
+**Controls
+local controls white asian hisp black race_other racecode_miss female female_miss  ///
+	age age_miss intl fareceipt fareceipt_miss firsttime i.termid ///
+	i.regpriority specprogram specprogram_miss specialadmit
+
+
+local estimate_dists = 1
+	
+
+				
+				
+	use "$output/distributions_ncourses_drop.dta", clear
+	sum EY_1
+	local EY_1=r(mean)
+	sum EY_0
+	local EY_0=r(mean)
+	sum KS
+	local ks=round(r(max),0.01)
+	sum y
+	local ymin=r(min)
+	local ymax=r(max)
+	drop if y>9 /* For readability of graph*/
+	
+	# delimit ;
+	graph twoway (line f1 y, lcolor(vermillion) lpattern(solid))
+		(line f0 y, lcolor(sea) lpattern(dash)),
+		scheme(plotplain)
+		xtitle("Number of Courses", size(large))
+		ytitle("")
+		ylabel(0 0.1 0.2 0.3,labsize(large))
+		xlabel(0 2 4 6 8, labsize(large))
+		xscale(noline)
+		yscale(range(0 0.3))
+		legend(lab(1 "Shutout of Course Section") lab(2 "Not Shutout") col(1) 
+		ring(0) bmargin(large) position(2) size(large))
+		title("Shutouts Increased Likelihood of Taking Zero Courses", size(large));
+	# delimit cr
+		
+	graph export "$graph/fig_complier_density_ncourses_drop_max.png", replace
+	
 
 
 
-# delimit ;
-twoway  (line transfer4 year if group=="asian", lcolor(vermillion) lpattern(solid) lwidth(medthick)) 
-		(line transfer4 year if group=="white", lcolor(gs13) lpattern(solid))
-		(line transfer4 year if group=="urm", lcolor(gs13) lpattern(solid)),
-		text(0.062 4 "Asian", size(large))
-		text(0 4 "White", size(large))
-		text(-0.04 4 "Underrep Minority", place(s) size(large))
-		legend(off) scheme(plotplain) 
-		yscale(range(-0.1 0.1)) ylabel(none)
-		xlabel(,labsize(large))
-		ytitle("") xtitle("")
-		title("")
-		subtitle("...And Others to Transfer to Four" "Year Schools", justification(left)
-		bexpand size(huge)) saving(t4, replace);
-# delimit cr
 
-graph combine "t2.gph" "t4.gph", scheme(plotplain) b1("Years Since Course Shutout", size(medlarge))
-graph export "fig_deanza.png", replace
+
 
