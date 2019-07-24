@@ -63,7 +63,8 @@ local estimate_dists = 1
 		yscale(range(0 0.3))
 		legend(lab(1 "Shutout of Course Section") lab(2 "Not Shutout") col(1) 
 		ring(0) bmargin(large) position(2) size(large))
-		title("Shutouts Increased Likelihood of Taking Zero Courses", size(large));
+		title("Shutouts increased likelihood of taking zero courses",
+			justification(left) bexpand size(vlarge));
 	# delimit cr
 		
 	graph export "$graph/fig_complier_density_ncourses_drop_max.png", replace
